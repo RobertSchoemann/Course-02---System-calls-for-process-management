@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/wait.h>
+#include<unistd.h>
+#include <stdbool.h> 
+
+char command[100];
+bool status = 0; // 1 when child is working
+
+void print_command_promt(){
+    printf("romt:~$ ");
+}
+
+void read_and_save_command(){
+    scanf("%99s", &command[0]);
+}
+
+int main(int argc, char **argv) {
+    pid_t  pid;
+    int status = 1000;
+
+    while(1) {
+        print_command_promt();
+        read_and_save_command();
+
+        pid = fork();
+
+        if(pid > 0) {
+            // parent process
+            wait(NULL);
+            //printf("parent active again\n");
+        }
+        else if(pid == 0){
+            // child process
+            char* argv[] = { "/bin/", NULL };
+            char* envp[] = { NULL };
+
+            //printf("command is: %s\n\n", command);
+            if(execve(command, argv, envp) == -1){
+                perror("execve failed");
+            }
+            exit(0);
+        }
+        else{
+            printf("Child process coudn't be created!");
+        }
+    }
+}
